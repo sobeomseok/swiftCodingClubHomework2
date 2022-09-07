@@ -8,69 +8,91 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var editMode = EditMode.inactive
+    
     var student = Members()
     
     var body: some View {
-        List {
-            Section {
-                HStack {
-                    Image(systemName: student.menber[0].imageName)
-                    Text(student.menber[0].name)
+        NavigationView {
+            List {
+                Section {
+                    HStack {
+                        Image(systemName: student.menber[0].imageName)
+                        Text(student.menber[0].name)
+                    }
+                    HStack {
+                        Image(systemName: student.menber[1].imageName)
+                        Text(student.menber[1].name)
+                    }
+                    HStack {
+                        Image(systemName: student.menber[2].imageName)
+                        Text(student.menber[2].name)
+                    }
+                } header: {
+                    HStack {
+                        Image(systemName: "bolt")
+                        Text("A CLASS")
+                    }
                 }
-                HStack {
-                    Image(systemName: student.menber[1].imageName)
-                    Text(student.menber[1].name)
+                
+                Section {
+                    HStack {
+                        Image(systemName: student.menber[0].imageName)
+                        Text(student.menber[0].name)
+                    }
+                    HStack {
+                        Image(systemName: student.menber[1].imageName)
+                        Text(student.menber[1].name)
+                    }
+                    HStack {
+                        Image(systemName: student.menber[2].imageName)
+                        Text(student.menber[2].name)
+                    }
+                } header: {
+                    HStack {
+                        Text("B CLASS")
+                    }
                 }
-                HStack {
-                    Image(systemName: student.menber[2].imageName)
-                    Text(student.menber[2].name)
-                }
-            } header: {
-                HStack {
-                    Image(systemName: "bolt")
-                    Text("A CLASS")
+                
+                Section {
+                    HStack {
+                        Image(systemName: student.menber[0].imageName)
+                        Text(student.menber[0].name)
+                    }
+                    HStack {
+                        Image(systemName: student.menber[1].imageName)
+                        Text(student.menber[1].name)
+                    }
+                    HStack {
+                        Image(systemName: student.menber[2].imageName)
+                        Text(student.menber[2].name)
+                    }
+                } header: {
+                    HStack {
+                        Text("C CLASS")
+                    }
+                } footer: {
+                    Text("copy right by Bas")
                 }
             }
-            
-            Section {
-                HStack {
-                    Image(systemName: student.menber[0].imageName)
-                    Text(student.menber[0].name)
+            .toolbar {
+                // Edit Button
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Edit") {
+                        print("DEBUG: Edit button Tapped")
+                    }
                 }
-                HStack {
-                    Image(systemName: student.menber[1].imageName)
-                    Text(student.menber[1].name)
-                }
-                HStack {
-                    Image(systemName: student.menber[2].imageName)
-                    Text(student.menber[2].name)
-                }
-            } header: {
-                HStack {
-                    Text("B CLASS")
+                // Add Button
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        print("DEBUG: button tapped")
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+
                 }
             }
-            
-            Section {
-                HStack {
-                    Image(systemName: student.menber[0].imageName)
-                    Text(student.menber[0].name)
-                }
-                HStack {
-                    Image(systemName: student.menber[1].imageName)
-                    Text(student.menber[1].name)
-                }
-                HStack {
-                    Image(systemName: student.menber[2].imageName)
-                    Text(student.menber[2].name)
-                }
-            } header: {
-                HStack {
-                    Text("C CLASS")
-                }
-            } footer: {
-                Text("copy right by Bas")
-            }
+            .navigationBarTitle("", displayMode: .inline)
         }
     }
 }
