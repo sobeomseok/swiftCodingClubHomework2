@@ -9,92 +9,155 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var editMode = EditMode.inactive
+    @State var MemberList = [Member]()
+    @State var member = Members().member
+    @State var studentGrade: String = ""
+    @State var studentname: String = ""
+    @State var showAddButtonView: Bool = false
+    @State var isPresentModal = false
     
-    var student = Members()
+    init() {
+        _MemberList = State(initialValue: member)
+    }
     
     var body: some View {
-        NavigationView {
-            List {
-                Section {
-                    HStack {
-                        Image(systemName: student.menber[0].imageName)
-                        Text(student.menber[0].name)
+        ZStack {
+            NavigationView {
+                List {
+                    Section {
+                        ForEach(MemberList, id: \.grade) { member in
+                            HStack {
+                                Image(systemName: member.imageName ?? "")
+                                Text(member.name)
+                            }
+                        }
+                        .onDelete(perform: delete)
+                        .onMove(perform: move)
+                    } header: {
+                        HStack {
+                            Image(systemName: "bolt")
+                            Text("A CLASS")
+                        }
                     }
-                    HStack {
-                        Image(systemName: student.menber[1].imageName)
-                        Text(student.menber[1].name)
+                    
+                    Section {
+                        ForEach(MemberList, id: \.name) { member in
+                            HStack {
+                                Image(systemName: member.imageName ?? "")
+                                Text(member.name)
+                            }
+                        }
+                        .onDelete(perform: delete)
+                        .onMove(perform: move)
+                    } header: {
+                        HStack {
+                            Text("B CLASS")
+                        }
                     }
-                    HStack {
-                        Image(systemName: student.menber[2].imageName)
-                        Text(student.menber[2].name)
-                    }
-                } header: {
-                    HStack {
-                        Image(systemName: "bolt")
-                        Text("A CLASS")
+                    
+                    Section {
+                        ForEach(MemberList, id: \.name) { member in
+                            HStack {
+                                Image(systemName: member.imageName ?? "")
+                                Text(member.name)
+                            }
+                        }
+                        .onDelete(perform: delete)
+                        .onMove(perform: move)
+                    } header: {
+                        HStack {
+                            Text("C CLASS")
+                        }
+                    } footer: {
+                        Text("copy right by Bas")
                     }
                 }
                 
-                Section {
-                    HStack {
-                        Image(systemName: student.menber[0].imageName)
-                        Text(student.menber[0].name)
+                .onAppear(perform: {
+                    UITableView.appearance().contentInset.top = -25
+                })
+                .toolbar {
+                    // Edit Button
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        EditButton()
                     }
-                    HStack {
-                        Image(systemName: student.menber[1].imageName)
-                        Text(student.menber[1].name)
+                    // Add Button
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            self.isPresentModal.toggle()
+                        }, label: {
+                            Image(systemName: "plus")
+                        })
                     }
-                    HStack {
-                        Image(systemName: student.menber[2].imageName)
-                        Text(student.menber[2].name)
-                    }
-                } header: {
-                    HStack {
-                        Text("B CLASS")
-                    }
+                    
                 }
-                
-                Section {
-                    HStack {
-                        Image(systemName: student.menber[0].imageName)
-                        Text(student.menber[0].name)
-                    }
-                    HStack {
-                        Image(systemName: student.menber[1].imageName)
-                        Text(student.menber[1].name)
-                    }
-                    HStack {
-                        Image(systemName: student.menber[2].imageName)
-                        Text(student.menber[2].name)
-                    }
-                } header: {
-                    HStack {
-                        Text("C CLASS")
-                    }
-                } footer: {
-                    Text("copy right by Bas")
+                .navigationBarTitle("", displayMode: .inline)
+                .sheet(isPresented: $isPresentModal) {
+                    AddMember(isPresented: $isPresentModal, didAddMember: { member in
+//                        print(member.name)
+                        self.MemberList.append(member)
+                        print("DEBUG: \(MemberList.description)")
+                    })
                 }
             }
-            .toolbar {
-                // Edit Button
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Edit") {
-                        print("DEBUG: Edit button Tapped")
-                    }
-                }
-                // Add Button
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        print("DEBUG: button tapped")
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-
-                }
-            }
-            .navigationBarTitle("", displayMode: .inline)
         }
     }
+    
+    func delete(indexSet: IndexSet) {
+        member.remove(atOffsets: indexSet)
+    }
+    
+    func move(indices: IndexSet, newOffset: Int) {
+        member.move(fromOffsets: indices, toOffset: newOffset)
+    }
+    
+}
+
+struct AddMember: View {
+    @State var selectedClass: classes = .A
+    @State var name: String = ""
+    @Binding var isPresented: Bool
+    
+    var didAddMember: (Member) -> ()
+    
+    var body: some View {
+        VStack {
+            mainView
+        }
+        Spacer()
+    }
+    
+    var mainView: some View {
+        VStack {
+            Picker("Choose a Class", selection: $selectedClass) {
+                ForEach(classes.allCases, id: \.self) { classes in
+                    Text("\(classes.rawValue)")
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding([.leading, .top, .trailing])
+            
+            TextField("Enter Your name", text: $name)
+                .padding(16)
+                .background(Color.gray.opacity(0.09))
+                .padding([.leading, .trailing])
+                .cornerRadius(5)
+            
+            Button {
+                self.isPresented = false
+                self.didAddMember(.init(name: self.name, grade: self.selectedClass))
+            } label: {
+                Text("Add")
+                    .frame(maxWidth: .infinity, maxHeight: 44)
+                    .background(.blue)
+                    .tint(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            .padding([.leading, .trailing])
+        }
+        
+    }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
@@ -103,15 +166,27 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-struct Member {
-    let name: String
-    let imageName: String
+// MARK: - Helpers
+enum classes: String, Equatable, CaseIterable {
+    case A = "A Class"
+    case B = "B Class"
+    case C = "C Class"
+}
+
+struct Member: Identifiable, Hashable {
+    var id = UUID()
+    var name: String
+    var imageName: String?
+    var grade: classes
 }
 
 struct Members {
-    let menber = [
-        Member(name: "Bas", imageName: "heart"),
-        Member(name: "Leeo", imageName: "heart.fill"),
-        Member(name: "Lia", imageName: "bolt")
+    var member = [
+        Member(name: "Bas", imageName: "heart", grade: .A),
+        Member(name: "Leeo", imageName: "heart.fill", grade: .B),
+        Member(name: "Lia", imageName: "bolt", grade: .C)
     ]
 }
+
+
+
